@@ -1,0 +1,61 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: An AWS Serverless Application Model template describing your function.
+Resources:
+  DLQretry:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Description: ''
+      MemorySize: 128
+      Timeout: 60
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.12
+      Architectures:
+        - arm64
+      EphemeralStorage:
+        Size: 512
+      Environment:
+        Variables:
+          DLQ_ARNS: >-
+            arn:aws:sqs:us-east-1:xxxxxxx:example-DLQ,arn:aws:sqs:us-east-1:xxxxxxx:example2-DLQ2
+        MaximumEventAgeInSeconds: 21600
+        MaximumRetryAttempts: 2
+      Layers:
+        - >-
+          arn:aws:lambda:us-east-1:xxxx:layer:LambdaInsightsExtension-Arm64:20
+      PackageType: Zip
+      Policies:
+        - Statement:
+            - Action:
+                - sqs:*
+              Effect: Allow
+              Resource: '*'
+            - Effect: Allow
+              Action:
+                - logs:CreateLogGroup
+              Resource: arn:aws:logs:us-east-1:666679366052:*
+            - Effect: Allow
+              Action:
+                - logs:CreateLogStream
+                - logs:PutLogEvents
+              Resource:
+                - >-
+                  arn:aws:logs:us-east-1:xxxx:log-group:/aws/lambda/DLQ-retry:*
+            - Sid: AWSLambdaSQSPollerExecutionRole
+              Effect: Allow
+              Action:
+                - sqs:DeleteMessage
+                - sqs:GetQueueAttributes
+                - sqs:ReceiveMessage
+              Resource: arn:aws:sqs:us-east-1:xxxx:*
+      RecursiveLoop: Terminate
+      SnapStart:
+        ApplyOn: None
+      Events:
+        Schedule1:
+          Type: Schedule
+          Properties:
+            Schedule: cron(0 0,12 * * ? *)
+      RuntimeManagementConfig:
+        UpdateRuntimeOn: Auto
