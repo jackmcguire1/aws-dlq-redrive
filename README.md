@@ -4,7 +4,9 @@ An automated solution for redriving messages from AWS SQS Dead Letter Queues (DL
 
 ## 🏆 AWS Hackathon Project
 
-This project demonstrates the power of serverless architecture to solve a common operational challenge: automatically retrying failed messages in SQS queues.
+This project demonstrates the use of AWS Lambda to solve a common operational challenge: automatically retrying failed messages in SQS queues.
+
+[AWS LAMBDA HACKATHON ON DEV.POST](https://awslambdahackathon.devpost.com/)
 
 ## 🎯 Problem Statement
 
